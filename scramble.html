@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+<title>SCRAMBLE</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+<script type="text/javascript">
+    ////////////////***********************//////////////////////
+function saveTextAsFile()
+{
+    var textToSave = document.getElementById("htmlOutput").value;
+    var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
+    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
+    var fileNameToSaveAs = document.getElementById("filenameField").value;
+ 
+    var downloadLink = document.createElement("a");
+    downloadLink.download = fileNameToSaveAs;
+    downloadLink.innerHTML = "Download File";
+    downloadLink.href = textToSaveAsURL;
+    downloadLink.onclick = destroyClickedElement;
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+ 
+    downloadLink.click();
+}
+ 
+function destroyClickedElement(event)
+{
+    document.body.removeChild(event.target);
+}
+ 
+function loadFileAsText()
+{
+    var fileToLoad = document.getElementById("fileToLoad").files[0];
+ 
+    var fileReader = new FileReader();
+    fileReader.onload = function(fileLoadedEvent) 
+    {
+        var textFromFileLoaded = fileLoadedEvent.target.result;
+        document.getElementById("inputTextToSave").value = textFromFileLoaded;
+    };
+    fileReader.readAsText(fileToLoad, "UTF-8");
+}
+ 
+	function pushback_one(text,original,exclude)
+	{
+		var pos = original.indexOf(exclude);
+
+		while (pos !== -1) {
+
+			//count++;
+			text = text.substr(0, pos) + exclude + text.substr(pos + exclude.length);
+			//alert(text+"\n"+pos);
+			pos = original.indexOf(exclude,pos+1);
+		}
+
+         return text;
+	}
+    function pushback_excludes(text,original,excludes)
+    {
+		excl_arry = excludes.split('|');	
+		
+		for (x in excl_arry){
+    		text = pushback_one(text,original,excl_arry[x])
+		}
+		//excludeone(text,excl_arry[0]);
+		//alert(text);
+		
+		return text;
+		
+    }
+    function excludeone(text,exclude)
+    {
+		
+		var spacefill = "_".repeat(exclude.length);
+		//alert(exclude+ "  " + spacefill);
+		var regex = new RegExp(exclude ,"gi");
+		return_text = text.replace(regex,spacefill);
+		
+		return return_text
+	}
+
+    function noscramblezone(text,excludes)
+    {
+		//alert(excludes);
+		excl_arry = excludes.split('|');	
+		for (x in excl_arry) {
+    		text = excludeone(text,excl_arry[x])
+		} 
+		//excludeone(text,excl_arry[0]);
+		//alert(text);
+		
+		return text
+	}
+	function replace_random_s(text,ch)
+	{
+		var lowercase = 'abcdefghijklmnopqrstuvwxyz';
+		
+		
+		
+	
+        var temp = text.split('');
+        	var pos = temp.indexOf(ch);
+		while (pos !== -1) {
+
+			//count++;
+			var ramd=Math.floor(Math.random() * 26)   ;
+			temp[pos]=lowercase[ramd];
+			//alert(pos);
+			pos = temp.indexOf(ch,pos);
+		}
+		
+		
+		text = temp.join('');
+		//alert(text);
+		//Scrambled1=text.replace(/s/g,lowercase[ramd]);
+		return text;
+	}
+	function replace_random_n(text,ch)
+	{
+			var number = '0123456789';
+		
+		
+		
+	
+        var temp = text.split('');
+        	var pos = temp.indexOf(ch);
+		while (pos !== -1) {
+
+			//count++;
+			var ramd=Math.floor(Math.random() * 10)   ;
+			temp[pos]=number[ramd];
+			//alert(pos);
+			pos = temp.indexOf(ch,pos);
+		}
+		
+		
+		text = temp.join('');
+		//alert(text);
+		//Scrambled1=text.replace(/s/g,lowercase[ramd]);
+		return text;
+	}
+	function replace_random_S(text,ch)
+	{
+		
+		var uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		
+		
+	
+		
+	
+        var temp = text.split('');
+        	var pos = temp.indexOf(ch);
+		while (pos !== -1) {
+
+			//count++;
+			var ramd=Math.floor(Math.random() * 26)   ;
+			temp[pos]=uppercase[ramd];
+			//alert(pos);
+			pos = temp.indexOf(ch,pos);
+		}
+		
+		
+		text = temp.join('');
+	
+		//Scrambled1=text.replace(/s/g,lowercase[ramd]);
+		return text;
+	}
+    function scramble()
+    {
+		excludes = document.getElementById("excludes").value ;
+		toScramble=document.getElementById("toScramble").value ;
+		excludes = excludes.replace(/,/g,'|');
+		toScramble0 = noscramblezone(toScramble,excludes);
+		
+		
+		//Scrambled1=toScramble.replace(/[a-zàâçéèêëîïôûùüÿñæœ]/g,'s');
+
+		Scrambled1=toScramble0.replace(/[a-zàâçéèêëîïôûùüÿñæœ]/g,'s');
+		Scrambled1=replace_random_s(Scrambled1,'s');
+		Scrambled2=Scrambled1.replace(/[A-Z]/g,'S');
+		Scrambled2=replace_random_S(Scrambled2,'S');
+		Scrambled3=Scrambled2.replace(/[0-9]/g,'1');
+		Scrambled3=replace_random_n(Scrambled3,'1');
+		
+		Scrambled4=pushback_excludes(Scrambled3,toScramble,excludes);
+		
+		//alert(Scrambled4);
+		document.getElementById("htmlOutput").value = Scrambled4;
+	}
+</script>
+<input type="text" id="excludes" size="100" value="dh,DH,Dh,that,scrambling,Bohnen" /><br />
+Load the data to Random Scramble from a file, then press the &lsquo;Scramble&rsquo; button:<br />
+Browse:<br />
+<input type="file" id="fileToScramble" name="fileToScramble" onchange='$("#uploadFileInfo").html($(this).val().replace(/^.*\\/, ""))' /> <br />
+Alternatively, type or paste in the text you want to Random Scramble, then press the&lsquo;Scramble&rsquo; button.<br />
+
+<textarea id="toScramble"   cols="150" rows="20" class="codec-input">
+
+These examples illustrate typical cases of scrambling in the midfield 567dh of a subordinate clause in German.
+All six clauses are acceptable, whereby the actual order that appears is determined 509DH by pragmatic considerations such as emphasis.
+If one takes the first clause (clause a) 4 as the basic order, then 44444444 8888888888 866649900 scrambling has 8 occurred in 00 clauses b–f. 
+The three constituents der Mann, der Frau, and die Bohnen have been scrambled.
+
+</textarea><br />
+<button onclick="return scramble()">Scramble</button><br />
+Scramble Result<br />
+<textarea id="htmlOutput" cols="150" rows="20"  class="codec-output"></textarea><br />
+<a href="#" id="fileOutputLink" onclick="saveTextAsFile()">Click here to download scrambled file</a>
+        as:<br />
+<input type="text" id="filenameField" value="Scrambled.txt" title="This name will be used as the default filename when you download." />
+
+
+
+
+               
+
+        
+
+
+  
+    </body>
+</html>
